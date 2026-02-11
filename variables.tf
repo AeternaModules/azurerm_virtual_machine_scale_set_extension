@@ -26,9 +26,9 @@ EOT
     type                         = string
     type_handler_version         = string
     virtual_machine_scale_set_id = string
-    auto_upgrade_minor_version   = optional(bool, true)
+    auto_upgrade_minor_version   = optional(bool) # Default: true
     automatic_upgrade_enabled    = optional(bool)
-    failure_suppression_enabled  = optional(bool, false)
+    failure_suppression_enabled  = optional(bool) # Default: false
     force_update_tag             = optional(string)
     protected_settings           = optional(string)
     provision_after_extensions   = optional(list(string))
