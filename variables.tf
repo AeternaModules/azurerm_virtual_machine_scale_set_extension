@@ -38,5 +38,43 @@ EOT
       source_vault_id = string
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        length(v.publisher) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        length(v.type) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        length(v.type_handler_version) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  # --- Unconfirmed validation candidates, derived from azurerm_virtual_machine_scale_set_extension's provider source ---
+  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
+  # or a path that crosses a list-typed block (needs its own for_each wrapping).
+  # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   source:    validation.All(...) - no translation rule yet, add one
+  # path: virtual_machine_scale_set_id
+  #   source:    [from commonids.ValidateVirtualMachineScaleSetID] !ok
+  # path: virtual_machine_scale_set_id
+  #   source:    [from commonids.ValidateVirtualMachineScaleSetID] err != nil
+  # path: protected_settings
+  #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
+  # path: settings
+  #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
 }
 
