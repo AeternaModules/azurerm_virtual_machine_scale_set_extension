@@ -1,3 +1,8 @@
+data "azurerm_key_vault_secret" "protected_settings" {
+  for_each     = { for k, v in var.virtual_machine_scale_set_extensions : k => v if v.protected_settings_key_vault_id != null && v.protected_settings_key_vault_secret_name != null }
+  name         = each.value.protected_settings_key_vault_secret_name
+  key_vault_id = each.value.protected_settings_key_vault_id
+}
 resource "azurerm_virtual_machine_scale_set_extension" "virtual_machine_scale_set_extensions" {
   for_each = var.virtual_machine_scale_set_extensions
 
@@ -10,7 +15,7 @@ resource "azurerm_virtual_machine_scale_set_extension" "virtual_machine_scale_se
   automatic_upgrade_enabled    = each.value.automatic_upgrade_enabled
   failure_suppression_enabled  = each.value.failure_suppression_enabled
   force_update_tag             = each.value.force_update_tag
-  protected_settings           = each.value.protected_settings
+  protected_settings           = each.value.protected_settings != null ? each.value.protected_settings : try(data.azurerm_key_vault_secret.protected_settings[each.key].value, null)
   provision_after_extensions   = each.value.provision_after_extensions
   settings                     = each.value.settings
 
