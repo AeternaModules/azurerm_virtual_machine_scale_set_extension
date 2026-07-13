@@ -42,28 +42,46 @@ EOT
       source_vault_id = string
     }))
   }))
-  # --- Unconfirmed validation candidates, derived from azurerm_virtual_machine_scale_set_extension's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: name
-  #   source:    validation.All(...) - no translation rule yet, add one
-  # path: virtual_machine_scale_set_id
-  #   source:    [from commonids.ValidateVirtualMachineScaleSetID] !ok
-  # path: virtual_machine_scale_set_id
-  #   source:    [from commonids.ValidateVirtualMachineScaleSetID] err != nil
-  # path: publisher
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: type
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: type_handler_version
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: protected_settings
-  #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
-  # path: settings
-  #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        length(v.publisher) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        length(v.type) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        length(v.type_handler_version) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        v.protected_settings == null || (can(jsondecode(v.protected_settings)))
+      )
+    ])
+    error_message = "must be valid JSON"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_set_extensions : (
+        v.settings == null || (can(jsondecode(v.settings)))
+      )
+    ])
+    error_message = "must be valid JSON"
+  }
+  # Note: 3 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
