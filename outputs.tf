@@ -29,7 +29,7 @@ output "virtual_machine_scale_set_extensions_protected_settings" {
 }
 output "virtual_machine_scale_set_extensions_protected_settings_from_key_vault" {
   description = "Map of protected_settings_from_key_vault values across all virtual_machine_scale_set_extensions, keyed the same as var.virtual_machine_scale_set_extensions"
-  value       = { for k, v in azurerm_virtual_machine_scale_set_extension.virtual_machine_scale_set_extensions : k => v.protected_settings_from_key_vault if v.protected_settings_from_key_vault != null && length(v.protected_settings_from_key_vault) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set_extension.virtual_machine_scale_set_extensions : k => one(v.protected_settings_from_key_vault) if v.protected_settings_from_key_vault != null && length(v.protected_settings_from_key_vault) > 0 }
 }
 output "virtual_machine_scale_set_extensions_provision_after_extensions" {
   description = "Map of provision_after_extensions values across all virtual_machine_scale_set_extensions, keyed the same as var.virtual_machine_scale_set_extensions"
